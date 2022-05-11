@@ -39,7 +39,7 @@ namespace TownGameBot
             ConfigureState(services);
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-            services.AddTransient<IBot, Bots.EchoBot>();
+            services.AddTransient<IBot, Bots.CityBot>();
         }
 
         private void ConfigureState(IServiceCollection services)

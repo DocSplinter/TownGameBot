@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using TownGameBot.Models;
 using TownGameBot.Services;
 
 namespace TownGameBot.Bots
@@ -23,9 +24,19 @@ namespace TownGameBot.Bots
             return base.OnMembersAddedAsync(membersAdded, turnContext, cancellationToken);
         }
 
-        protected override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            return base.OnMessageActivityAsync(turnContext, cancellationToken);
+            //return base.OnMessageActivityAsync(turnContext, cancellationToken);
+            CityList cityList = await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList());
+
+            string allCityString = "";
+
+            foreach (var CityModel in cityList.CityModels)
+            {
+                allCityString += CityModel.City + "; ";
+            }
+
+            await turnContext.SendActivityAsync(MessageFactory.Text(allCityString), cancellationToken);
         }
     }
 }

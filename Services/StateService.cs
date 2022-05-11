@@ -11,9 +11,9 @@ namespace TownGameBot.Services
     {
         public ConversationState ConversationState { get; }
 
-        public static string CityModelId { get; } = $"{nameof(StateService)}.CityModel";
+        public static string CityListId { get; } = $"{nameof(StateService)}.CityList";
 
-        public IStatePropertyAccessor<CityModel> CityModelAccessor { get; set; }
+        public IStatePropertyAccessor<CityList> CityListAccessor { get; set; }
 
         public StateService(ConversationState conversationState)
         {
@@ -24,7 +24,7 @@ namespace TownGameBot.Services
 
         private void InitializeAccessor()
         {
-            CityModelAccessor = ConversationState.CreateProperty<CityModel>(CityModelId);
+            CityListAccessor = ConversationState.CreateProperty<CityList>(CityListId);
         }
     }
 }
