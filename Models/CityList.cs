@@ -7,7 +7,7 @@ namespace TownGameBot.Models
 {
     public class CityList
     {
-        public List<CityModel> CityModels { get; set; } = new List<CityModel> { new CityModel { City = "London"},
+        public CityModel[] CityModels { get; set; } = new CityModel[] {         new CityModel { City = "London"},
                                                                                 new CityModel { City = "Paris"},
                                                                                 new CityModel { City = "Oslo"},
                                                                                 new CityModel { City = "Istanbul"},

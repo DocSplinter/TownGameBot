@@ -13,23 +13,33 @@ namespace TownGameBot.Bots
     public class CityBot : ActivityHandler
     {
         private readonly StateService _stateService;
+        public string allCityString = "";
 
         public CityBot(StateService stateService)
         {
             _stateService = stateService ?? throw new ArgumentNullException(nameof(stateService));
         }
 
-        protected override Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+        
+
+        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            return base.OnMembersAddedAsync(membersAdded, turnContext, cancellationToken);
+            //return base.OnMembersAddedAsync(membersAdded, turnContext, cancellationToken);
+            foreach (var member in membersAdded)
+            {
+                if (member.Id != turnContext.Activity.Recipient.Id)
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Привет! Как тебя зовут"), cancellationToken);
+                }
+            }
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             //return base.OnMessageActivityAsync(turnContext, cancellationToken);
-            CityList cityList = await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList());
+            CityList cityList =  await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList());
 
-            string allCityString = "";
+            //string allCityString = "";
 
             foreach (var CityModel in cityList.CityModels)
             {
