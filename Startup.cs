@@ -56,6 +56,9 @@ namespace TownGameBot
             // Create the Conversation state. 
             services.AddSingleton<ConversationState>();
 
+            // Create the user state
+            services.AddSingleton<UserState>();
+
             // Create an instanc of the state service 
             services.AddSingleton<StateService>();
         }
