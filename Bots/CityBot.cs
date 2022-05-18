@@ -13,7 +13,7 @@ namespace TownGameBot.Bots
     public class CityBot : ActivityHandler
     {
         private readonly StateService _stateService;
-        public string allCityString = "";
+        public string messageText = "";
 
         public CityBot(StateService stateService)
         {
@@ -38,15 +38,38 @@ namespace TownGameBot.Bots
         {
             //return base.OnMessageActivityAsync(turnContext, cancellationToken);
             CityList cityList =  await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList());
+            UserProfile userProfile = await _stateService.UserProfileAccessor.GetAsync(turnContext, () => new UserProfile());
 
+            messageText = turnContext.Activity.Text;
             //string allCityString = "";
 
-            foreach (var CityModel in cityList.CityModels)
-            {
-                allCityString += CityModel.City + "; ";
-            }
+            //foreach (var CityModel in cityList.CityModels)
+            //{
+            //    allCityString += CityModel.City + "; ";
+            //}
 
-            await turnContext.SendActivityAsync(MessageFactory.Text(allCityString), cancellationToken);
+            //await turnContext.SendActivityAsync(MessageFactory.Text(allCityString), cancellationToken);
+
+            if (!string.IsNullOrEmpty(userProfile.Name))
+            {
+                if(messageText.ToLower() == "да")
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Играем играем!!!!"), cancellationToken);
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Ну не хочешь, как хочешь..."), cancellationToken);
+                }
+            }
+            else
+            {
+                userProfile.Name = messageText.Trim();
+
+                await _stateService.UserProfileAccessor.SetAsync(turnContext, userProfile);
+                await _stateService.UserState.SaveChangesAsync(turnContext);
+
+                await turnContext.SendActivityAsync(MessageFactory.Text(String.Format("{0}, давай поиграем в города. Скажи: 'да', если согласен поиграть", userProfile.Name)), cancellationToken);
+            }
         }
     }
 }
