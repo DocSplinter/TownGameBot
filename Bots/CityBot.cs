@@ -14,6 +14,7 @@ namespace TownGameBot.Bots
     {
         private readonly StateService _stateService;
         public string messageText = "";
+        public string responseText = "";
 
         public CityBot(StateService stateService)
         {
@@ -24,7 +25,6 @@ namespace TownGameBot.Bots
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            //return base.OnMembersAddedAsync(membersAdded, turnContext, cancellationToken);
             foreach (var member in membersAdded)
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
@@ -36,40 +36,82 @@ namespace TownGameBot.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            //return base.OnMessageActivityAsync(turnContext, cancellationToken);
             CityList cityList =  await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList());
             UserProfile userProfile = await _stateService.UserProfileAccessor.GetAsync(turnContext, () => new UserProfile());
+            ConversationData conversationData = await _stateService.ConversationDataAccessor.GetAsync(turnContext, () => new ConversationData());
 
             messageText = turnContext.Activity.Text;
-            //string allCityString = "";
+            responseText = "не пойдет, тебе надо назвать город на";
 
-            //foreach (var CityModel in cityList.CityModels)
-            //{
-            //    allCityString += CityModel.City + "; ";
-            //}
 
-            //await turnContext.SendActivityAsync(MessageFactory.Text(allCityString), cancellationToken);
-
-            if (!string.IsNullOrEmpty(userProfile.Name))
+            if (!conversationData.OnGame)
             {
-                if(messageText.ToLower() == "да")
+                if (!string.IsNullOrEmpty(userProfile.Name))
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Играем играем!!!!"), cancellationToken);
+                    if (messageText.ToLower() == "да")
+                    {
+                        conversationData.OnGame = true;
+
+                        await _stateService.ConversationDataAccessor.SetAsync(turnContext, conversationData);
+                        await _stateService.ConversationState.SaveChangesAsync(turnContext);
+
+                        await turnContext.SendActivityAsync(MessageFactory.Text("Играем играем!!!! Москва, тебе на 'А'"), cancellationToken);
+                    }
+                    else
+                    {
+                        await turnContext.SendActivityAsync(MessageFactory.Text("Ну не хочешь, как хочешь... Если захочешь поиграть, просто скажи 'да' "), cancellationToken);
+                    }
                 }
                 else
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Ну не хочешь, как хочешь..."), cancellationToken);
+                    userProfile.Name = messageText.Trim();
+
+                    await _stateService.UserProfileAccessor.SetAsync(turnContext, userProfile);
+                    await _stateService.UserState.SaveChangesAsync(turnContext);
+
+                    await turnContext.SendActivityAsync(MessageFactory.Text(String.Format("{0}, давай поиграем в города. Скажи: 'да', если согласен поиграть", userProfile.Name)), cancellationToken);
                 }
             }
             else
             {
-                userProfile.Name = messageText.Trim();
+                if(conversationData.FirstLetter != messageText.ToLower().Substring(1, 1)) //!!!!!!!!!!!!!!!!!!
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"{messageText} {responseText} '{conversationData.FirstLetter.ToUpper()}'"), cancellationToken);
+                }
+                else
+                {
+                    string text = Game(messageText, cityList.CityModels);
+                    responseText = text switch
+                    {
+                        "0" => "Я не нашёл такого города в моём списке",
+                        "1" => $"{messageText} уже был",
+                        _ => text,
+                    };
+                    await turnContext.SendActivityAsync(MessageFactory.Text(responseText), cancellationToken);
 
-                await _stateService.UserProfileAccessor.SetAsync(turnContext, userProfile);
-                await _stateService.UserState.SaveChangesAsync(turnContext);
 
-                await turnContext.SendActivityAsync(MessageFactory.Text(String.Format("{0}, давай поиграем в города. Скажи: 'да', если согласен поиграть", userProfile.Name)), cancellationToken);
+                }
+                
             }
+
+            //.....
         }
+
+        public string Game(string city, CityModel[] cityModels)
+        {
+            string lastLetter = messageText.ToLower().Substring(messageText.Length - 1); //!!!!!!!!!!!!!!!!!!!!!!
+            return "City";
+        }
+
+        public string GetFirstLetter(string word)
+        {
+            return "";
+        }
+
+        public string GetLastLetter(string word)
+        {
+            return "";
+        }
+
     }
 }
