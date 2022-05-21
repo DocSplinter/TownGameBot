@@ -74,7 +74,7 @@ namespace TownGameBot.Bots
             }
             else
             {
-                if(conversationData.FirstLetter != messageText.ToLower().Substring(1, 1)) //!!!!!!!!!!!!!!!!!!
+                if(conversationData.FirstLetter != GetFirstLetter(messageText))
                 {
                     await turnContext.SendActivityAsync(MessageFactory.Text($"{messageText} {responseText} '{conversationData.FirstLetter.ToUpper()}'"), cancellationToken);
                 }
@@ -99,18 +99,30 @@ namespace TownGameBot.Bots
 
         public string Game(string city, CityModel[] cityModels)
         {
-            string lastLetter = messageText.ToLower().Substring(messageText.Length - 1); //!!!!!!!!!!!!!!!!!!!!!!
-            return "City";
+            int citiesCount = cityModels.Length;
+            int startIndex = new Random().Next(1, citiesCount - 2);
+            string searchCity = "0";
+
+            for(int k = startIndex; k < citiesCount - 1; k++)
+            {
+
+            }
+
+            for(int k = 0; k < startIndex; k++)
+            {
+
+            }
+            return searchCity;
         }
 
         public string GetFirstLetter(string word)
         {
-            return "";
+            return word.ToLower().Substring(1, 1);
         }
 
         public string GetLastLetter(string word)
         {
-            return "";
+            return word.ToLower().Substring(word.Length - 1);
         }
 
     }
