@@ -102,15 +102,24 @@ namespace TownGameBot.Bots
             int citiesCount = cityModels.Length;
             int startIndex = new Random().Next(1, citiesCount - 2);
             string searchCity = "0";
+            string lastLetter = GetLastLetter(city);
+            string firstLetter, newCity = "";
+            int s = startIndex;
+            int f = citiesCount - 1;
 
-            for(int k = startIndex; k < citiesCount - 1; k++)
+            for(int i = 0; i < 2; i++)
             {
-
-            }
-
-            for(int k = 0; k < startIndex; k++)
-            {
-
+                for(int k = s; k < f; k++)
+                {
+                    
+                    firstLetter = GetFirstLetter(cityModels[k].City);
+                    if(lastLetter.ToLower() == firstLetter.ToLower())
+                    {
+                        newCity = cityModels[k].City;
+                    }
+                }
+                s = 0;
+                f = startIndex;
             }
             return searchCity;
         }
