@@ -80,12 +80,12 @@ namespace TownGameBot.Bots
                 }
                 else
                 {
-                    string text = Game(messageText, cityList.CityModels);
+                    string text = Game(messageText, cityList.CityModels, conversationData.OnGame); //!!!!
                     responseText = text switch
                     {
                         "0" => "Я не нашёл такого города в моём списке",
                         "1" => $"{messageText} уже был",
-                        _ => text,
+                        _ => text
                     };
                     await turnContext.SendActivityAsync(MessageFactory.Text(responseText), cancellationToken);
 
@@ -97,7 +97,7 @@ namespace TownGameBot.Bots
             //.....
         }
 
-        public string Game(string city, CityModel[] cityModels)
+        public string Game(string city, CityModel[] cityModels, bool flag)
         {
             int citiesCount = cityModels.Length;
             int startIndex = new Random().Next(1, citiesCount - 2);
@@ -111,7 +111,19 @@ namespace TownGameBot.Bots
             {
                 for(int k = s; k < f; k++)
                 {
-                    
+                    if(city.ToLower() == cityModels[k].City.ToLower())
+                    {
+                        if(cityModels[k].NamedCity == false)
+                        {
+                            cityModels[k].NamedCity = true;
+                            searchCity = "2";
+                        }
+                        else
+                        {
+                            searchCity = "1";
+                        }
+                    }
+
                     firstLetter = GetFirstLetter(cityModels[k].City);
                     if(lastLetter.ToLower() == firstLetter.ToLower())
                     {
@@ -121,7 +133,18 @@ namespace TownGameBot.Bots
                 s = 0;
                 f = startIndex;
             }
-            return searchCity;
+
+            if(string.IsNullOrEmpty(newCity))
+            {
+                flag = false;
+                return "Тарааамм!! Ты выиграл!!! Поздравляю с победой!!!!";
+            }
+            else
+            {
+                flag = true;
+                return searchCity == "2" ? newCity : searchCity;
+            }
+            
         }
 
         public string GetFirstLetter(string word)
