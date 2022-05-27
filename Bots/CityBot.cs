@@ -68,8 +68,8 @@ namespace TownGameBot.Bots
 
                     await _stateService.UserProfileAccessor.SetAsync(turnContext, userProfile);
                     await _stateService.UserState.SaveChangesAsync(turnContext);
-
-                    await turnContext.SendActivityAsync(MessageFactory.Text(String.Format("{0}, давай поиграем в города. Скажи: 'да', если согласен поиграть", userProfile.Name)), cancellationToken);
+                                                                                                                                           
+                    await turnContext.SendActivityAsync(MessageFactory.Text(String.Format("{0}, давай поиграем в города. Скажи: 'да', если будешь играть", userProfile.Name)), cancellationToken);
                 }
             }
             else
@@ -107,7 +107,7 @@ namespace TownGameBot.Bots
         {
             int citiesCount = cityList.CityModels.Length;
             int startIndex = new Random().Next(1, citiesCount - 2);
-            string searchCity = "0";
+            string gameState = "0";
             string lastLetter = GetLastLetter(city);
             string firstLetter, newCity = "";
             int s = startIndex;
@@ -122,25 +122,28 @@ namespace TownGameBot.Bots
                         if(cityList.CityModels[k].NamedCity == false)
                         {
                             cityList.CityModels[k].NamedCity = true;
-                            searchCity = "2";
+                            gameState = "2";
                         }
                         else
                         {
-                            searchCity = "1";
+                            gameState = "1";
                         }
                     }
 
                     firstLetter = GetFirstLetter(cityList.CityModels[k].City);
                     if(lastLetter.ToLower() == firstLetter.ToLower())
                     {
-                        newCity = cityList.CityModels[k].City;
+                        if(!cityList.CityModels[k].NamedCity)
+                        {
+                            newCity = cityList.CityModels[k].City;
+                        }
                     }
                 }
                 s = 0;
                 f = startIndex;
             }
 
-            if(searchCity == "2")
+            if(gameState == "2")
             {
                 if(string.IsNullOrEmpty(newCity))
                 {
@@ -150,12 +153,21 @@ namespace TownGameBot.Bots
                 else
                 {
                     conversationData.OnGame = true;
+                    conversationData.FirstLetter = GetLastLetter(newCity);
+                    foreach(var cityModel in cityList.CityModels)
+                    {
+                        if(cityModel.City.ToLower() == newCity.ToLower())
+                        {
+                            cityModel.NamedCity = true;
+                            break;
+                        }
+                    }
                     return newCity;
                 }
             }
             else
             {
-                return searchCity;
+                return gameState;
             }
 
             
@@ -164,12 +176,22 @@ namespace TownGameBot.Bots
 
         public string GetFirstLetter(string word)
         {
-            return word.ToLower().Substring(1, 1);
+            return word.ToLower().Substring(0, 1);
         }
 
         public string GetLastLetter(string word)
         {
-            return word.ToLower().Substring(word.Length - 1);
+            string[] offSideLetters = { "й", "ь", "ъ", "ы" };
+            string letter;
+            int i = 1;
+            do
+            {
+                letter = word.ToLower().Substring(word.Length - i, 1);
+                i++;
+            }
+            while (offSideLetters.Contains<string>(letter));
+
+            return letter;
         }
 
     }
