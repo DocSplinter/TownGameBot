@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Configuration;
 using TownGameBot.Models;
 using TownGameBot.Services;
 
@@ -13,15 +14,39 @@ namespace TownGameBot.Bots
     public class CityBot : ActivityHandler
     {
         private readonly StateService _stateService;
+        protected readonly int expireAfterSeconds;
         public string messageText = "";
         public string responseText = "";
 
-        public CityBot(StateService stateService)
+        public CityBot(IConfiguration configuration, StateService stateService)
         {
             _stateService = stateService ?? throw new ArgumentNullException(nameof(stateService));
+            expireAfterSeconds = configuration.GetValue<int>("ExpireAfterSeconds");
         }
 
-        
+         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
+        {
+            // Retrieve the property value, and compare it to the current time.
+            var lastAcces = await _stateService.TimeAccessor.GetAsync(turnContext, () => DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
+            if(DateTime.UtcNow - lastAcces >= TimeSpan.FromSeconds(expireAfterSeconds))
+            {
+                // Notify the user that the conversation is being restarted.
+                await turnContext.SendActivityAsync("Я скучал по тебе...").ConfigureAwait(false);
+
+                // Clear state.
+                await _stateService.ConversationState.ClearStateAsync(turnContext, cancellationToken).ConfigureAwait(false);
+
+            }
+
+            await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
+
+            // Set LastAccessedTime to the current time.
+            await _stateService.TimeAccessor.SetAsync(turnContext, DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
+
+            // Save any state changes that might have occurred during the turn.
+            await _stateService.ConversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
+            await _stateService.UserState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
+        }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
@@ -59,7 +84,8 @@ namespace TownGameBot.Bots
                     }
                     else
                     {
-                        await turnContext.SendActivityAsync(MessageFactory.Text("Ну не хочешь, как хочешь... Если захочешь поиграть, просто скажи 'да' "), cancellationToken);
+                        await turnContext.SendActivityAsync(MessageFactory.Text(string.Format
+                            ("{0}, если захочешь поиграть, просто скажи 'да'. Дольше {1} минут не тупи, а то я буду скучать", userProfile.Name, Math.Ceiling((double)expireAfterSeconds / 60))), cancellationToken);
                     }
                 }
                 else
@@ -194,5 +220,6 @@ namespace TownGameBot.Bots
             return letter;
         }
 
+       
     }
 }
