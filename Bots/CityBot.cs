@@ -17,11 +17,13 @@ namespace TownGameBot.Bots
         protected readonly int expireAfterSeconds;
         public string messageText = "";
         public string responseText = "";
+        private AplicationContext db;
 
-        public CityBot(IConfiguration configuration, StateService stateService)
+        public CityBot(IConfiguration configuration, StateService stateService, AplicationContext context)
         {
             _stateService = stateService ?? throw new ArgumentNullException(nameof(stateService));
             expireAfterSeconds = configuration.GetValue<int>("ExpireAfterSeconds");
+            db = context;
         }
 
          public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)

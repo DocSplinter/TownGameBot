@@ -10,8 +10,10 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System;
+using TownGameBot.Models;
 using TownGameBot.Services;
 
 namespace TownGameBot
@@ -28,6 +30,10 @@ namespace TownGameBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string connection = Configuration.GetConnectionString("DefaultConnection");
+
+            services.AddDbContext<AplicationContext>(options => options.UseSqlServer(connection));
+
             services.AddHttpClient().AddControllers().AddNewtonsoftJson();
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
