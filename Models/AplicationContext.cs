@@ -8,7 +8,7 @@ namespace TownGameBot.Models
 {
     public class AplicationContext : DbContext
     {
-        public DbSet<CityModel> Cities { get; set; }
+        public DbSet<CityModel> CityModels { get; set; }
 
         public AplicationContext(DbContextOptions<AplicationContext> options)
             :base(options)

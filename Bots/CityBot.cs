@@ -17,13 +17,94 @@ namespace TownGameBot.Bots
         protected readonly int expireAfterSeconds;
         public string messageText = "";
         public string responseText = "";
-        private AplicationContext db;
+        readonly AplicationContext db;
 
         public CityBot(IConfiguration configuration, StateService stateService, AplicationContext context)
         {
             _stateService = stateService ?? throw new ArgumentNullException(nameof(stateService));
             expireAfterSeconds = configuration.GetValue<int>("ExpireAfterSeconds");
             db = context;
+
+            if(!db.CityModels.Any())
+            {
+                db.CityModels.Add(new CityModel { City = "Майкоп" });
+                db.CityModels.Add(new CityModel { City = "Уфа" });
+                db.CityModels.Add(new CityModel { City = "Горно-Алтайск" });
+                db.CityModels.Add(new CityModel { City = "Махачкала" });
+                db.CityModels.Add(new CityModel { City = "Нальчик" });
+                db.CityModels.Add(new CityModel { City = "Элиста" });
+                db.CityModels.Add(new CityModel { City = "Черкесск" });
+                db.CityModels.Add(new CityModel { City = "Петрозаводск" });
+                db.CityModels.Add(new CityModel { City = "Сыктывкар" });
+                db.CityModels.Add(new CityModel { City = "Йошкар-Ола" });
+                db.CityModels.Add(new CityModel { City = "Саранск" });
+                db.CityModels.Add(new CityModel { City = "Якутск" });
+                db.CityModels.Add(new CityModel { City = "Владикавказ" });
+                db.CityModels.Add(new CityModel { City = "Кызыл" });
+                db.CityModels.Add(new CityModel { City = "Ижевск" });
+                db.CityModels.Add(new CityModel { City = "Абакан" });
+                db.CityModels.Add(new CityModel { City = "Барнаул" });
+                db.CityModels.Add(new CityModel { City = "Краснодар" });
+                db.CityModels.Add(new CityModel { City = "Красноярск" });
+                db.CityModels.Add(new CityModel { City = "Владивосток" });
+                db.CityModels.Add(new CityModel { City = "Ставрополь" });
+                db.CityModels.Add(new CityModel { City = "Хабаровск" });
+                db.CityModels.Add(new CityModel { City = "Благовещенск" });
+                db.CityModels.Add(new CityModel { City = "Архангельск" });
+                db.CityModels.Add(new CityModel { City = "Белгород" });
+                db.CityModels.Add(new CityModel { City = "Брянск" });
+                db.CityModels.Add(new CityModel { City = "Владимир" });
+                db.CityModels.Add(new CityModel { City = "Волгоград" });
+                db.CityModels.Add(new CityModel { City = "Вологда" });
+                db.CityModels.Add(new CityModel { City = "Иваново" });
+                db.CityModels.Add(new CityModel { City = "Иркутск" });
+                db.CityModels.Add(new CityModel { City = "Калининград" });
+                db.CityModels.Add(new CityModel { City = "Калуга" });
+                db.CityModels.Add(new CityModel { City = "Петропавловск-Камчатский" });
+                db.CityModels.Add(new CityModel { City = "Кемерово" });
+                db.CityModels.Add(new CityModel { City = "Киров" });
+                db.CityModels.Add(new CityModel { City = "Кострома" });
+                db.CityModels.Add(new CityModel { City = "Курган" });
+                db.CityModels.Add(new CityModel { City = "Курск" });
+                db.CityModels.Add(new CityModel { City = "Санкт-Петербург" });
+                db.CityModels.Add(new CityModel { City = "Липецк" });
+                db.CityModels.Add(new CityModel { City = "Магадан" });
+                db.CityModels.Add(new CityModel { City = "Москва", NamedCity = true });
+                db.CityModels.Add(new CityModel { City = "Мурманск" });
+                db.CityModels.Add(new CityModel { City = "Нижний Новгород" });
+                db.CityModels.Add(new CityModel { City = "Новгород" });
+                db.CityModels.Add(new CityModel { City = "Новосибирск" });
+                db.CityModels.Add(new CityModel { City = "Омск" });
+                db.CityModels.Add(new CityModel { City = "Оренбург" });
+                db.CityModels.Add(new CityModel { City = "Орел" });
+                db.CityModels.Add(new CityModel { City = "Пенза" });
+                db.CityModels.Add(new CityModel { City = "Псков" });
+                db.CityModels.Add(new CityModel { City = "Ростов-на-Дону" });
+                db.CityModels.Add(new CityModel { City = "Самара" });
+                db.CityModels.Add(new CityModel { City = "Саратов" });
+                db.CityModels.Add(new CityModel { City = "Южно-Сахалинск" });
+                db.CityModels.Add(new CityModel { City = "Екатеринбург" });
+                db.CityModels.Add(new CityModel { City = "Смоленск" });
+                db.CityModels.Add(new CityModel { City = "Тамбов" });
+                db.CityModels.Add(new CityModel { City = "Томск" });
+                db.CityModels.Add(new CityModel { City = "Тула" });
+                db.CityModels.Add(new CityModel { City = "Ульяновск" });
+                db.CityModels.Add(new CityModel { City = "Челябинск" });
+                db.CityModels.Add(new CityModel { City = "Чита" });
+                db.CityModels.Add(new CityModel { City = "Биробиджан" });
+                db.CityModels.Add(new CityModel { City = "Агинское" });
+                db.CityModels.Add(new CityModel { City = "Кудымкар" });
+                db.CityModels.Add(new CityModel { City = "Палана" });
+                db.CityModels.Add(new CityModel { City = "Нарьян-Мар" });
+                db.CityModels.Add(new CityModel { City = "Астрахань" });
+                db.CityModels.Add(new CityModel { City = "Дудинка" });
+                db.CityModels.Add(new CityModel { City = "Усть-Ордынский" });
+                db.CityModels.Add(new CityModel { City = "Ханты-Мансийск" });
+                db.CityModels.Add(new CityModel { City = "Тура" });
+                db.CityModels.Add(new CityModel { City = "Салехард" });
+                db.CityModels.Add(new CityModel { City = "Грозный" });
+                db.SaveChanges();
+            }
         }
 
          public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
@@ -63,7 +144,7 @@ namespace TownGameBot.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            CityList cityList =  await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList());
+            CityList cityList =  await _stateService.CityListAccessor.GetAsync(turnContext, () => new CityList { CityModels = db.CityModels.ToArray() } );
             UserProfile userProfile = await _stateService.UserProfileAccessor.GetAsync(turnContext, () => new UserProfile());
             ConversationData conversationData = await _stateService.ConversationDataAccessor.GetAsync(turnContext, () => new ConversationData());
 
