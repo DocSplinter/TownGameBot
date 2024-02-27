@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using TownGameBot.Models;
 using TownGameBot.Services;
+using System.Diagnostics;
 
 namespace TownGameBot
 {
@@ -31,6 +32,8 @@ namespace TownGameBot
         public void ConfigureServices(IServiceCollection services)
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
+            
+            Debug.Print(connection);
 
             services.AddDbContext<AplicationContext>(options => options.UseSqlServer(connection));
 
