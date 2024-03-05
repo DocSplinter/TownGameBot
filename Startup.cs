@@ -33,9 +33,12 @@ namespace TownGameBot
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
             
-            Debug.Print(connection);
+ //           Debug.Print(connection);
 
-            services.AddDbContext<AplicationContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<AplicationContext>(options =>
+            {
+                options.UseSqlite(connection);
+            });
 
             services.AddHttpClient().AddControllers().AddNewtonsoftJson();
 
